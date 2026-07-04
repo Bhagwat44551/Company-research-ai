@@ -27,7 +27,7 @@ async function searchCompany(query) {
 async function askAI(prompt, model = "anthropic/claude-sonnet-4") {
   const res = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
     model: model,
-    messages: [{ role: "user", content: prompt }],max_tokens: 300
+    messages: [{ role: "user", content: prompt }],max_tokens: 800
   }, {
     headers: {
       Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
