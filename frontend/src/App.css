@@ -1,38 +1,131 @@
-.App {
-  text-align: center;
+body {
+  background: #0d0d0d;
+  color: #e5e5e5;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  margin: 0;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+.app-container {
+  display: flex;
   min-height: 100vh;
+}
+
+.sidebar {
+  width: 260px;
+  background: #171717;
+  border-right: 1px solid #2a2a2a;
+  padding: 20px;
+}
+
+.sidebar h3 {
+  font-size: 13px;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 12px;
+}
+
+.model-select {
+  width: 100%;
+  padding: 10px;
+  background: #262626;
+  color: #e5e5e5;
+  border: 1px solid #333;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.main-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  padding: 60px 20px;
 }
 
-.App-link {
-  color: #61dafb;
+.hero-title {
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-align: center;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.hero-subtitle {
+  color: #999;
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.search-bar {
+  display: flex;
+  width: 100%;
+  max-width: 640px;
+  gap: 10px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 14px 16px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 10px;
+  color: #e5e5e5;
+  font-size: 15px;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #555;
+}
+
+.research-btn {
+  padding: 14px 24px;
+  background: #e5e5e5;
+  color: #111;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.research-btn:hover {
+  background: #fff;
+}
+
+.research-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.result-card {
+  width: 100%;
+  max-width: 640px;
+  margin-top: 32px;
+  background: #171717;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.result-card h3 {
+  margin-top: 0;
+  color: #fff;
+}
+
+.download-btn {
+  margin-top: 16px;
+  padding: 10px 18px;
+  background: transparent;
+  border: 1px solid #444;
+  color: #e5e5e5;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.download-btn:hover {
+  border-color: #777;
+}
+
+.error-text {
+  color: #ff6b6b;
+  margin-top: 16px;
 }

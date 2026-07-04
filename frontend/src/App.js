@@ -1,5 +1,6 @@
 import { useState } from 'react';
-
+import ReactMarkdown from 'react-markdown';
+import './App.css';
 
 function App() {
   const [input, setInput] = useState('');
@@ -9,9 +10,9 @@ function App() {
   const [model, setModel] = useState('anthropic/claude-sonnet-4');
 
   const models = [
-  { label: 'Claude Sonnet 4', value: 'anthropic/claude-sonnet-4' },
-  { label: 'GPT-4o', value: 'openai/gpt-4o' },
-  { label: 'Gemini Pro 1.5', value: 'google/gemini-pro-1.5' },
+    { label: 'Claude Sonnet 4', value: 'anthropic/claude-sonnet-4' },
+    { label: 'GPT-4o', value: 'openai/gpt-4o' },
+    { label: 'Gemini 3.5 Flash', value: 'google/gemini-3.5-flash' },
   ];
 
   const handleSearch = async () => {
@@ -19,22 +20,15 @@ function App() {
     setLoading(true);
     setError('');
     setResult(null);
-
     try {
       const res = await fetch('https://company-research-ai-swoc.onrender.com/research', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          input,
-          model
-        })
+        body: JSON.stringify({ input, model })
       });
       const data = await res.json();
-      if (data.error) {
-        setError(data.error);
-      } else {
-        setResult(data);
-      }
+      if (data.error) setError(data.error);
+      else setResult(data);
     } catch (err) {
       setError('Something went wrong');
     }
@@ -56,43 +50,45 @@ function App() {
   };
 
   return (
-    <div style={{ maxWidth: 700, margin: '40px auto', padding: 20, fontFamily: 'sans-serif' }}>
-      <h1 style={{ textAlign: 'center' }}>Know any company in minutes.</h1>
-      <p style={{ textAlign: 'center', color: '#666' }}>
-        Enter a company name or website URL to get AI-powered insights.
-      </p>
+    <div className="app-container">
+      <aside className="sidebar">
+        <h3>AI Model</h3>
+        <select className="model-select" value={model} onChange={(e) => setModel(e.target.value)}>
+          {models.map((m) => (
+            <option key={m.value} value={m.value}>{m.label}</option>
+          ))}
+        </select>
+      </aside>
 
-      <select value={model} onChange={(e) => setModel(e.target.value)} style={{ marginBottom: 10, padding: 8 }}>
-        {models.map((m) => (
-          <option key={m.value} value={m.value}>{m.label}</option>
-        ))}
-      </select>
-      <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-          placeholder="Enter company name or URL (e.g. Stripe or https://stripe.com)"
-          style={{ flex: 1, padding: 10, fontSize: 16 }}
-        />
-        <button onClick={handleSearch} style={{ padding: '10px 20px', fontSize: 16 }}>
-          {loading ? 'Researching...' : 'Research'}
-        </button>
-      </div>
+      <main className="main-content">
+        <h1 className="hero-title">Know any company in minutes.</h1>
+        <p className="hero-subtitle">Enter a company name or website URL to get AI-powered insights.</p>
 
-      {error && <p style={{ color: 'red', marginTop: 20 }}>{error}</p>}
-
-      {result && (
-        <div style={{ marginTop: 30, padding: 20, border: '1px solid #ddd', borderRadius: 8 }}>
-          <h3>Website: {result.website}</h3>
-          <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', lineHeight: 1.6 }}>
-            {result.aiResult}
-          </pre>
-          <button onClick={handleDownloadPDF} style={{ marginTop: 10, padding: '8px 16px' }}>
-            Download PDF Report
+        <div className="search-bar">
+          <input
+            className="search-input"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            placeholder="e.g. Stripe or https://stripe.com"
+          />
+          <button className="research-btn" onClick={handleSearch} disabled={loading}>
+            {loading ? 'Researching...' : 'Research'}
           </button>
         </div>
-      )}
+
+        {error && <p className="error-text">{error}</p>}
+
+        {result && (
+          <div className="result-card">
+            <h3>{result.website}</h3>
+            <ReactMarkdown>{result.aiResult}</ReactMarkdown>
+            <button className="download-btn" onClick={handleDownloadPDF}>
+              Download PDF Report
+            </button>
+          </div>
+        )}
+      </main>
     </div>
   );
 }
