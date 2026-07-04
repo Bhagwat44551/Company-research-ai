@@ -16,9 +16,10 @@ app.use(express.json());
 async function searchCompany(query) {
   const res = await axios.post('https://google.serper.dev/search',
     { q: query },
-    { headers: { 'X-API-KEY': process.env.SERPER_API_KEY, 'Content-Type': 'application/json' },
-    timeout: 8000
-   }
+    {
+      headers: { 'X-API-KEY': process.env.SERPER_API_KEY, 'Content-Type': 'application/json' },
+      timeout: 8000
+    }
   );
   return res.data;
 }
@@ -27,7 +28,7 @@ async function searchCompany(query) {
 async function askAI(prompt, model = "anthropic/claude-sonnet-4") {
   const res = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
     model: model,
-    messages: [{ role: "user", content: prompt }],max_tokens: 800
+    messages: [{ role: "user", content: prompt }], max_tokens: 800
   }, {
     headers: {
       Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
@@ -39,8 +40,10 @@ async function askAI(prompt, model = "anthropic/claude-sonnet-4") {
 }
 
 app.get('/', (req, res) => {
-    console.log('GET / request received');
-  res.send('Backend is running');
+  res.json({
+    status: 'Backend is running',
+    message: 'This is the API server. Visit the frontend app to use the Company Research Assistant.'
+  });
 });
 
 app.get('/test-search', async (req, res) => {
@@ -57,13 +60,13 @@ app.get('/test-ai', async (req, res) => {
     const result = await askAI("Say hello and confirm you're working, in one line.");
     res.json({ result });
   } catch (err) {
-  console.log("Status:", err.response?.status);
-  console.log("Data:", err.response?.data);
+    console.log("Status:", err.response?.status);
+    console.log("Data:", err.response?.data);
 
-  res.status(500).json(err.response?.data || {
-    error: err.message
-  });
-}
+    res.status(500).json(err.response?.data || {
+      error: err.message
+    });
+  }
 });
 
 //Serach Route
