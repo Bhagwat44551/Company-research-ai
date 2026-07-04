@@ -79,6 +79,8 @@ app.post('/research', async (req, res) => {
       pageText = page.data.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').slice(0, 3000);
     } catch (e) {
       console.log('Crawl failed, using snippet instead:', e.message);
+      pageText = snippet;
+
     }
 
     const prompt = `Based on this information about "${input}":
