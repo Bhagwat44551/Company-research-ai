@@ -21,7 +21,7 @@ function App() {
     setResult(null);
 
     try {
-      const res = await fetch('/research', {
+      const res = await fetch('https://company-research-ai-swoc.onrender.com/research', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -42,7 +42,7 @@ function App() {
   };
 
   const handleDownloadPDF = async () => {
-    const res = await fetch('/generate-pdf', {
+    const res = await fetch('https://company-research-ai-swoc.onrender.com/generate-pdf', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(result)
