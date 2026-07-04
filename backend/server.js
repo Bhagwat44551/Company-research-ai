@@ -100,7 +100,7 @@ Return a structured research report with these sections:
 
 Format clearly with headers.`;
 
-    const aiResult = await askAI(prompt, model || "anthropic/claude-sonnet-4");
+    const aiResult = await askAI(prompt, model || "openrouter/free");
 
     res.json({ input, website, aiResult });
   } catch (err) {

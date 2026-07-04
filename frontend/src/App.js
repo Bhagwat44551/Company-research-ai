@@ -7,9 +7,10 @@ function App() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [model, setModel] = useState('anthropic/claude-sonnet-4');
+  const [model, setModel] = useState('openrouter/free');
 
   const models = [
+    { label: 'Free Model (Auto)', value: 'openrouter/free' },
     { label: 'Claude Sonnet 4', value: 'anthropic/claude-sonnet-4' },
     { label: 'GPT-4o', value: 'openai/gpt-4o' },
     { label: 'Gemini 3.5 Flash', value: 'google/gemini-3.5-flash' },
