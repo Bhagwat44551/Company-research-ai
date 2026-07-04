@@ -31,7 +31,7 @@ async function askAI(prompt, model) {
     const res = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
       model: useModel,
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 20
+      max_tokens: 600
     }, {
       headers: {
         Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
