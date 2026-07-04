@@ -6,10 +6,11 @@ const axios = require('axios');
 const PDFDocument = require('pdfkit');
 
 const PORT = process.env.PORT || 8000;
-
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+const DEFAULT_MODEL = "anthropic/claude-sonnet-4";
 
 // Serper search function
 async function searchCompany(query) {
@@ -24,19 +25,26 @@ async function searchCompany(query) {
 }
 
 // OpenRouter function
-async function askAI(prompt, model = "anthropic/claude-sonnet-4") {
-  const res = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-    model: model,
-    messages: [{ role: "user", content: prompt }],
-    max_tokens: 800
-  }, {
-    headers: {
-      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-      'Content-Type': 'application/json'
-    },
-    timeout: 25000 // AI generation needs real time — 2s was way too short
-  });
-  return res.data.choices[0].message.content;
+async function askAI(prompt, model) {
+  const useModel = model || DEFAULT_MODEL;
+  try {
+    const res = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
+      model: useModel,
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 800
+    }, {
+      headers: {
+        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      timeout: 25000
+    });
+    return res.data.choices[0].message.content;
+  } catch (e) {
+    console.log('OPENROUTER RAW ERROR:', JSON.stringify(e.response?.data));
+    console.log('MODEL USED:', useModel);
+    throw e;
+  }
 }
 
 app.get('/', (req, res) => {
@@ -57,19 +65,15 @@ app.get('/test-ai', async (req, res) => {
     const result = await askAI("Say hello and confirm you're working, in one line.");
     res.json({ result });
   } catch (err) {
-    console.log("Status:", err.response?.status);
-    console.log("Data:", err.response?.data);
     res.status(500).json(err.response?.data || { error: err.message });
   }
 });
 
-// Research Route — each step isolated so one failure doesn't kill everything
 app.post('/research', async (req, res) => {
   const { input, model } = req.body;
   let website = input;
   let pageText = '';
 
-  // Step 1: Search (critical)
   try {
     const searchData = await searchCompany(input);
     const topResult = searchData.organic?.[0] || {};
@@ -80,7 +84,6 @@ app.post('/research', async (req, res) => {
     return res.status(500).json({ error: 'Search failed, please try again' });
   }
 
-  // Step 2: Crawl (non-critical, falls back to snippet)
   try {
     const page = await axios.get(website, {
       timeout: 5000,
@@ -91,7 +94,6 @@ app.post('/research', async (req, res) => {
     console.log('CRAWL ERROR:', e.code || e.message);
   }
 
-  // Step 3: AI (critical)
   try {
     const prompt = `Based on this information about "${input}":
 ${pageText}
@@ -107,7 +109,7 @@ Return a structured research report with these sections:
 
 Format clearly with headers.`;
 
-    const aiResult = await askAI(prompt, model || "anthropic/claude-sonnet-4");
+    const aiResult = await askAI(prompt, model);
     res.json({ input, website, aiResult });
   } catch (e) {
     console.log('AI ERROR:', e.code || e.message);
@@ -115,15 +117,12 @@ Format clearly with headers.`;
   }
 });
 
-// PDF Route
 app.post('/generate-pdf', (req, res) => {
   try {
     const { input, website, aiResult } = req.body;
-
     const doc = new PDFDocument({ margin: 50 });
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${input}-research-report.pdf"`);
-
     doc.pipe(res);
     doc.fontSize(22).text('Company Research Report', { align: 'center' });
     doc.moveDown();
