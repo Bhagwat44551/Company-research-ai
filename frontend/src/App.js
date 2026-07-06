@@ -9,6 +9,13 @@ function App() {
   const [error, setError] = useState('');
   const [model, setModel] = useState('openrouter/free');
 
+  //Discored state
+  const [botToken, setBotToken] = useState('');
+  const [channelId, setChannelId] = useState('');
+  const [applicantName, setApplicantName] = useState('');
+  const [applicantEmail, setApplicantEmail] = useState('');
+  const [discordSent, setDiscordSent] = useState(false);
+
   const models = [
     { label: 'Free Model (Auto)', value: 'openrouter/free' },
     { label: 'Claude Sonnet 4', value: 'anthropic/claude-sonnet-4' },
@@ -16,11 +23,48 @@ function App() {
     { label: 'Gemini 3.5 Flash', value: 'google/gemini-3.5-flash' },
   ];
 
+  //Discord config section in the sidebar
+  <div style={{ marginTop: 24 }}>
+    <h3 style={{ fontSize: 13, textTransform: 'uppercase', color: '#888', marginBottom: 12 }}>
+      Discord Integration
+    </h3>
+    <input
+      className="search-input"
+      placeholder="Discord Bot Token"
+      value={botToken}
+      onChange={(e) => setBotToken(e.target.value)}
+      style={{ marginBottom: 8, width: '100%' }}
+    />
+    <input
+      className="search-input"
+      placeholder="Discord Channel ID"
+      value={channelId}
+      onChange={(e) => setChannelId(e.target.value)}
+      style={{ marginBottom: 8, width: '100%' }}
+    />
+    <input
+      className="search-input"
+      placeholder="Applicant Full Name"
+      value={applicantName}
+      onChange={(e) => setApplicantName(e.target.value)}
+      style={{ marginBottom: 8, width: '100%' }}
+    />
+    <input
+      className="search-input"
+      placeholder="Applicant Email"
+      value={applicantEmail}
+      onChange={(e) => setApplicantEmail(e.target.value)}
+      style={{ marginBottom: 8, width: '100%' }}
+    />
+  </div>
+
   const handleSearch = async () => {
     if (!input.trim()) return;
     setLoading(true);
     setError('');
     setResult(null);
+    setDiscordSent(false);
+
     try {
       const res = await fetch('https://company-research-ai-swoc.onrender.com/research', {
         method: 'POST',
@@ -28,8 +72,27 @@ function App() {
         body: JSON.stringify({ input, model })
       });
       const data = await res.json();
-      if (data.error) setError(data.error);
-      else setResult(data);
+      if (data.error) {
+        setError(data.error);
+      } else {
+        setResult(data);
+        // Auto-send to Discord if configured
+        if (botToken && channelId) {
+          try {
+            await fetch('https://company-research-ai-swoc.onrender.com/send-discord', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                botToken, channelId, applicantName, applicantEmail,
+                input: data.input, website: data.website, aiResult: data.aiResult
+              })
+            });
+            setDiscordSent(true);
+          } catch (e) {
+            console.log('Discord send failed:', e);
+          }
+        }
+      }
     } catch (err) {
       setError('Something went wrong');
     }
@@ -87,6 +150,7 @@ function App() {
             <button className="download-btn" onClick={handleDownloadPDF}>
               Download PDF Report
             </button>
+            {discordSent && <p style={{ color: '#4ade80', marginTop: 8 }}>✓ Sent to Discord</p>}
           </div>
         )}
       </main>

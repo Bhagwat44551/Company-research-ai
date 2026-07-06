@@ -69,6 +69,22 @@ app.get('/test-ai', async (req, res) => {
   }
 });
 
+//Discord func
+async function sendToDiscord(botToken, channelId, message) {
+  const res = await axios.post(
+    `https://discord.com/api/v10/channels/${channelId}/messages`,
+    { content: message },
+    {
+      headers: {
+        Authorization: `Bot ${botToken}`,
+        'Content-Type': 'application/json'
+      },
+      timeout: 8000
+    }
+  );
+  return res.data;
+}
+
 //Serach Route
 app.post('/research', async (req, res) => {
   try {
@@ -108,6 +124,27 @@ Format clearly with headers.`;
     res.json({ input, website, aiResult });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+//Discord send route
+app.post('/send-discord', async (req, res) => {
+  try {
+    const { botToken, channelId, applicantName, applicantEmail, input, website, aiResult } = req.body;
+
+    const message = `**New Company Research Report**
+Submitted by: ${applicantName} (${applicantEmail})
+
+**Company:** ${input}
+**Website:** ${website}
+
+${aiResult.slice(0, 1800)}`; // Discord has a 2000 char limit per message
+
+    await sendToDiscord(botToken, channelId, message);
+    res.json({ success: true });
+  } catch (err) {
+    console.log('DISCORD ERROR:', err.response?.data || err.message);
+    res.status(500).json({ error: 'Failed to send to Discord' });
   }
 });
 
