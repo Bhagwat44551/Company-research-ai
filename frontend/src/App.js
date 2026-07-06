@@ -20,9 +20,9 @@ function App() {
     { label: 'Free Model (Auto)', value: 'openrouter/free' },
     { label: 'Claude Sonnet 4', value: 'anthropic/claude-sonnet-4' },
     { label: 'GPT-4o', value: 'openai/gpt-4o' },
-    { label: 'Gemini 3.5 Flash', value: 'google/gemini-3.5-flash' },
     { label: 'DeepSeek R1 (Free)', value: 'deepseek/deepseek-r1:free' },
-    { label: 'Llama 3.3 70B (Free)', value: 'meta-llama/llama-3.3-70b-instruct:free' },
+    { label: 'Llama 3.3 70B (Free)', value: 'meta-llama/llama-3.3-70b:free' },
+    { label: 'Gemini 2.0 Flash (Free)', value: 'google/gemini-2.0-flash-exp:free' },
   ];
 
   const examples = ['stripe.com', 'Tesla', 'Microsoft', 'OpenAI'];
@@ -77,7 +77,7 @@ function App() {
   return (
     <div className="app-container">
       <aside className="sidebar">
-        <div className="sidebar-header">Relu Consultancy</div>
+        <div className="sidebar-header">Company Research AI</div>
         <div className="tab-row">
           <button className={`tab-btn ${activeTab === 'api' ? 'active' : ''}`} onClick={() => setActiveTab('api')}>API</button>
           <button className={`tab-btn ${activeTab === 'discord' ? 'active' : ''}`} onClick={() => setActiveTab('discord')}>DISCORD</button>
