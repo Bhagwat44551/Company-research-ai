@@ -89,7 +89,7 @@ function App() {
           ))}
         </select>
 
-        //Discord config section in the sidebar
+        {/* Discord config section in the sidebar */}
         <div style={{ marginTop: 24 }}>
           <h3 style={{ fontSize: 13, textTransform: 'uppercase', color: '#888', marginBottom: 12 }}>
             Discord Integration
