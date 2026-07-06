@@ -18,10 +18,9 @@ function App() {
 
   const models = [
     { label: 'Free Model (Auto)', value: 'openrouter/free' },
-    { label: 'Poolside Laguna XS 2.1 (Free)', value: 'poolside/laguna-xs-2.1:free' },
-    { label: 'NVIDIA Llama Nemotron Rerank VL 1B V2 (Free)', value: 'nvidia/llama-nemotron-rerank-vl-1b-v2:free' },
     { label: 'Google Gemma 4 31B IT (Free)', value: 'google/gemma-4-31b-it:free' },
     { label: 'OpenAI GPT-OSS 120B (Free)', value: 'openai/gpt-oss-120b:free' },
+    { label: 'Poolside Laguna XS 2.1 (Free)', value: 'poolside/laguna-xs-2.1:free' },
   ];
 
   const examples = ['stripe.com', 'Tesla', 'Microsoft', 'OpenAI'];
