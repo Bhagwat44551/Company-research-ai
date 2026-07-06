@@ -13,11 +13,14 @@ app.use(cors());
 app.use(express.json());
 
 //Serper search function
-async function searchCompany(query) {
+async function searchCompany(query, serperKey) {
   const res = await axios.post('https://google.serper.dev/search',
     { q: query },
     {
-      headers: { 'X-API-KEY': process.env.SERPER_API_KEY, 'Content-Type': 'application/json' },
+      headers: {
+        'X-API-KEY': serperKey || process.env.SERPER_API_KEY,
+        'Content-Type': 'application/json'
+      },
       timeout: 8000
     }
   );
@@ -25,18 +28,26 @@ async function searchCompany(query) {
 }
 
 //OpenRouter function
-async function askAI(prompt, model = "openrouter/free") {
-  const res = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-    model: model,
-    messages: [{ role: "user", content: prompt }], max_tokens: 800
-  }, {
-    headers: {
-      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-      'Content-Type': 'application/json'
-    },
-    timeout: 25000
-  });
-  return res.data.choices[0].message.content;
+async function askAI(prompt, model, openrouterKey) {
+  const useModel = model || "openrouter/free";
+  const useKey = openrouterKey || process.env.OPENROUTER_API_KEY;
+  try {
+    const res = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
+      model: useModel,
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 800
+    }, {
+      headers: {
+        Authorization: `Bearer ${useKey}`,
+        'Content-Type': 'application/json'
+      },
+      timeout: 25000
+    });
+    return res.data.choices[0].message.content;
+  } catch (e) {
+    console.log('OPENROUTER RAW ERROR:', JSON.stringify(e.response?.data));
+    throw e;
+  }
 }
 
 app.get('/', (req, res) => {
@@ -87,24 +98,28 @@ async function sendToDiscord(botToken, channelId, message) {
 
 //Serach Route
 app.post('/research', async (req, res) => {
+  const { input, model, serperKey, openrouterKey } = req.body;
+  let website = input;
+  let pageText = '';
+
   try {
-    const { input, model } = req.body; // add model here
-
-    const searchData = await searchCompany(input);
+    const searchData = await searchCompany(input, serperKey);
     const topResult = searchData.organic?.[0] || {};
-    const website = topResult.link || input;
-    const snippet = topResult.snippet || '';
+    website = topResult.link || input;
+    pageText = topResult.snippet || '';
+  } catch (e) {
+    console.log('SEARCH ERROR:', e.code || e.message);
+    return res.status(500).json({ error: 'Search failed, please try again' });
+  }
 
-    let pageText = snippet;
-    try {
-      const page = await axios.get(website, { timeout: 5000, headers: { 'User-Agent': 'Mozilla/5.0' } });
-      pageText = page.data.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').slice(0, 3000);
-    } catch (e) {
-      console.log('Crawl failed, using snippet instead:', e.message);
-      pageText = snippet;
+  try {
+    const page = await axios.get(website, { timeout: 5000, headers: { 'User-Agent': 'Mozilla/5.0' } });
+    pageText = page.data.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').slice(0, 3000);
+  } catch (e) {
+    console.log('CRAWL ERROR:', e.code || e.message);
+  }
 
-    }
-
+  try {
     const prompt = `Based on this information about "${input}":
 ${pageText}
 
@@ -119,11 +134,11 @@ Return a structured research report with these sections:
 
 Format clearly with headers.`;
 
-    const aiResult = await askAI(prompt, model || "openrouter/free");
-
+    const aiResult = await askAI(prompt, model, openrouterKey);
     res.json({ input, website, aiResult });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  } catch (e) {
+    console.log('AI ERROR:', e.code || e.message);
+    res.status(500).json({ error: 'AI service failed, please try again' });
   }
 });
 

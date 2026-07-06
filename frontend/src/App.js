@@ -3,60 +3,54 @@ import ReactMarkdown from 'react-markdown';
 import './App.css';
 
 function App() {
+  const [activeTab, setActiveTab] = useState('api');
   const [input, setInput] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [model, setModel] = useState('openrouter/free');
-
-  //Discored state
+  const [serperKey, setSerperKey] = useState('');
+  const [openrouterKey, setOpenrouterKey] = useState('');
   const [botToken, setBotToken] = useState('');
   const [channelId, setChannelId] = useState('');
   const [applicantName, setApplicantName] = useState('');
   const [applicantEmail, setApplicantEmail] = useState('');
-  const [discordSent, setDiscordSent] = useState(false);
+  const [serperKey, setSerperKey] = useState('');
+  const [openrouterKey, setOpenrouterKey] = useState('');
 
   const models = [
     { label: 'Free Model (Auto)', value: 'openrouter/free' },
     { label: 'Claude Sonnet 4', value: 'anthropic/claude-sonnet-4' },
     { label: 'GPT-4o', value: 'openai/gpt-4o' },
-    { label: 'Gemini 3.5 Flash', value: 'google/gemini-3.5-flash' },
   ];
 
+  const examples = ['stripe.com', 'Tesla', 'Microsoft', 'OpenAI'];
 
-  const handleSearch = async () => {
-    if (!input.trim()) return;
+  const runSearch = async (query) => {
+    if (!query.trim()) return;
     setLoading(true);
     setError('');
     setResult(null);
-    setDiscordSent(false);
-
     try {
       const res = await fetch('https://company-research-ai-swoc.onrender.com/research', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ input, model })
+        body: JSON.stringify({ input: query, model, serperKey, openrouterKey })
       });
       const data = await res.json();
       if (data.error) {
         setError(data.error);
       } else {
         setResult(data);
-        // Auto-send to Discord if configured
         if (botToken && channelId) {
-          try {
-            await fetch('https://company-research-ai-swoc.onrender.com/send-discord', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                botToken, channelId, applicantName, applicantEmail,
-                input: data.input, website: data.website, aiResult: data.aiResult
-              })
-            });
-            setDiscordSent(true);
-          } catch (e) {
-            console.log('Discord send failed:', e);
-          }
+          fetch('https://company-research-ai-swoc.onrender.com/send-discord', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              botToken, channelId, applicantName, applicantEmail,
+              input: data.input, website: data.website, aiResult: data.aiResult
+            })
+          }).catch(() => {});
         }
       }
     } catch (err) {
@@ -82,78 +76,103 @@ function App() {
   return (
     <div className="app-container">
       <aside className="sidebar">
-        <h3>AI Model</h3>
-        <select className="model-select" value={model} onChange={(e) => setModel(e.target.value)}>
-          {models.map((m) => (
-            <option key={m.value} value={m.value}>{m.label}</option>
-          ))}
-        </select>
+        <div className="sidebar-header">Relu Consultancy</div>
+        <div className="tab-row">
+          <button className={`tab-btn ${activeTab === 'api' ? 'active' : ''}`} onClick={() => setActiveTab('api')}>API</button>
+          <button className={`tab-btn ${activeTab === 'discord' ? 'active' : ''}`} onClick={() => setActiveTab('discord')}>DISCORD</button>
+        </div>
 
-        {/* Discord config section in the sidebar */}
-        <div style={{ marginTop: 24 }}>
-          <h3 style={{ fontSize: 13, textTransform: 'uppercase', color: '#888', marginBottom: 12 }}>
-            Discord Integration
-          </h3>
-          <input
-            className="search-input"
-            placeholder="Discord Bot Token"
-            value={botToken}
-            onChange={(e) => setBotToken(e.target.value)}
-            style={{ marginBottom: 8, width: '100%' }}
-          />
-          <input
-            className="search-input"
-            placeholder="Discord Channel ID"
-            value={channelId}
-            onChange={(e) => setChannelId(e.target.value)}
-            style={{ marginBottom: 8, width: '100%' }}
-          />
-          <input
-            className="search-input"
-            placeholder="Applicant Full Name"
-            value={applicantName}
-            onChange={(e) => setApplicantName(e.target.value)}
-            style={{ marginBottom: 8, width: '100%' }}
-          />
-          <input
-            className="search-input"
-            placeholder="Applicant Email"
-            value={applicantEmail}
-            onChange={(e) => setApplicantEmail(e.target.value)}
-            style={{ marginBottom: 8, width: '100%' }}
-          />
+        <div className="sidebar-content">
+          {activeTab === 'api' && (
+            <>
+              <label className="field-label">OpenRouter API Key</label>
+              <input
+                className="sidebar-input"
+                type="password"
+                value={openrouterKey}
+                onChange={(e) => setOpenrouterKey(e.target.value)}
+                placeholder="sk-or-... (optional)"
+              />
+
+              <label className="field-label">Serper.dev API Key</label>
+              <input
+                className="sidebar-input"
+                type="password"
+                value={serperKey}
+                onChange={(e) => setSerperKey(e.target.value)}
+                placeholder="Your Serper key (optional)"
+              />
+
+              <label className="field-label">AI Model</label>
+              <select className="sidebar-input" value={model} onChange={(e) => setModel(e.target.value)}>
+                {models.map((m) => (
+                  <option key={m.value} value={m.value}>{m.label}</option>
+                ))}
+              </select>
+
+              <button className="save-btn">Save Configuration</button>
+            </>
+          )}
+
+          {activeTab === 'discord' && (
+            <>
+              <label className="field-label">Bot Token</label>
+              <input className="sidebar-input" value={botToken} onChange={(e) => setBotToken(e.target.value)} placeholder="Your Discord bot token" />
+
+              <label className="field-label">Channel ID</label>
+              <input className="sidebar-input" value={channelId} onChange={(e) => setChannelId(e.target.value)} placeholder="000000000000000000" />
+
+              <label className="field-label">Full Name</label>
+              <input className="sidebar-input" value={applicantName} onChange={(e) => setApplicantName(e.target.value)} placeholder="Your full name" />
+
+              <label className="field-label">Email Address</label>
+              <input className="sidebar-input" value={applicantEmail} onChange={(e) => setApplicantEmail(e.target.value)} placeholder="email@example.com" />
+
+              <button className="save-btn">Save Discord Config</button>
+            </>
+          )}
         </div>
       </aside>
 
       <main className="main-content">
-        <h1 className="hero-title">Know any company in minutes.</h1>
-        <p className="hero-subtitle">Enter a company name or website URL to get AI-powered insights.</p>
+        {!result && !loading && (
+          <>
+            <div className="hero-tag">AI-Powered Intelligence</div>
+            <h1 className="hero-title">Know any company in minutes.</h1>
+            <p className="hero-subtitle">
+              Enter a company name or website URL to get AI-powered insights, competitor analysis, pain points, and a professional PDF report.
+            </p>
+            <div className="example-chips">
+              {examples.map((ex) => (
+                <div key={ex} className="chip" onClick={() => { setInput(ex); runSearch(ex); }}>{ex}</div>
+              ))}
+            </div>
+          </>
+        )}
 
-        <div className="search-bar">
-          <input
-            className="search-input"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            placeholder="e.g. Stripe or https://stripe.com"
-          />
-          <button className="research-btn" onClick={handleSearch} disabled={loading}>
-            {loading ? 'Researching...' : 'Research'}
-          </button>
-        </div>
-
+        {loading && <p>Researching...</p>}
         {error && <p className="error-text">{error}</p>}
 
         {result && (
           <div className="result-card">
             <h3>{result.website}</h3>
             <ReactMarkdown>{result.aiResult}</ReactMarkdown>
-            <button className="download-btn" onClick={handleDownloadPDF}>
-              Download PDF Report
-            </button>
-            {discordSent && <p style={{ color: '#4ade80', marginTop: 8 }}>✓ Sent to Discord</p>}
+            <button className="download-btn" onClick={handleDownloadPDF}>Download PDF Report</button>
           </div>
         )}
+
+        <div className="bottom-bar">
+          <input
+            className="search-input"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && runSearch(input)}
+            placeholder="Enter a company name (e.g. Stripe) or website URL (e.g. https://stripe.com)"
+          />
+          <button className="research-btn" onClick={() => runSearch(input)} disabled={loading}>
+            {loading ? '...' : 'Research →'}
+          </button>
+        </div>
       </main>
     </div>
   );
