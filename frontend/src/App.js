@@ -23,40 +23,6 @@ function App() {
     { label: 'Gemini 3.5 Flash', value: 'google/gemini-3.5-flash' },
   ];
 
-  //Discord config section in the sidebar
-  <div style={{ marginTop: 24 }}>
-    <h3 style={{ fontSize: 13, textTransform: 'uppercase', color: '#888', marginBottom: 12 }}>
-      Discord Integration
-    </h3>
-    <input
-      className="search-input"
-      placeholder="Discord Bot Token"
-      value={botToken}
-      onChange={(e) => setBotToken(e.target.value)}
-      style={{ marginBottom: 8, width: '100%' }}
-    />
-    <input
-      className="search-input"
-      placeholder="Discord Channel ID"
-      value={channelId}
-      onChange={(e) => setChannelId(e.target.value)}
-      style={{ marginBottom: 8, width: '100%' }}
-    />
-    <input
-      className="search-input"
-      placeholder="Applicant Full Name"
-      value={applicantName}
-      onChange={(e) => setApplicantName(e.target.value)}
-      style={{ marginBottom: 8, width: '100%' }}
-    />
-    <input
-      className="search-input"
-      placeholder="Applicant Email"
-      value={applicantEmail}
-      onChange={(e) => setApplicantEmail(e.target.value)}
-      style={{ marginBottom: 8, width: '100%' }}
-    />
-  </div>
 
   const handleSearch = async () => {
     if (!input.trim()) return;
@@ -122,6 +88,41 @@ function App() {
             <option key={m.value} value={m.value}>{m.label}</option>
           ))}
         </select>
+
+        //Discord config section in the sidebar
+        <div style={{ marginTop: 24 }}>
+          <h3 style={{ fontSize: 13, textTransform: 'uppercase', color: '#888', marginBottom: 12 }}>
+            Discord Integration
+          </h3>
+          <input
+            className="search-input"
+            placeholder="Discord Bot Token"
+            value={botToken}
+            onChange={(e) => setBotToken(e.target.value)}
+            style={{ marginBottom: 8, width: '100%' }}
+          />
+          <input
+            className="search-input"
+            placeholder="Discord Channel ID"
+            value={channelId}
+            onChange={(e) => setChannelId(e.target.value)}
+            style={{ marginBottom: 8, width: '100%' }}
+          />
+          <input
+            className="search-input"
+            placeholder="Applicant Full Name"
+            value={applicantName}
+            onChange={(e) => setApplicantName(e.target.value)}
+            style={{ marginBottom: 8, width: '100%' }}
+          />
+          <input
+            className="search-input"
+            placeholder="Applicant Email"
+            value={applicantEmail}
+            onChange={(e) => setApplicantEmail(e.target.value)}
+            style={{ marginBottom: 8, width: '100%' }}
+          />
+        </div>
       </aside>
 
       <main className="main-content">
