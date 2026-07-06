@@ -15,11 +15,14 @@ function App() {
   const [channelId, setChannelId] = useState('');
   const [applicantName, setApplicantName] = useState('');
   const [applicantEmail, setApplicantEmail] = useState('');
-  
+
   const models = [
     { label: 'Free Model (Auto)', value: 'openrouter/free' },
     { label: 'Claude Sonnet 4', value: 'anthropic/claude-sonnet-4' },
     { label: 'GPT-4o', value: 'openai/gpt-4o' },
+    { label: 'Gemini 3.5 Flash', value: 'google/gemini-3.5-flash' },
+    { label: 'DeepSeek R1 (Free)', value: 'deepseek/deepseek-r1:free' },
+    { label: 'Llama 3.3 70B (Free)', value: 'meta-llama/llama-3.3-70b-instruct:free' },
   ];
 
   const examples = ['stripe.com', 'Tesla', 'Microsoft', 'OpenAI'];
@@ -48,7 +51,7 @@ function App() {
               botToken, channelId, applicantName, applicantEmail,
               input: data.input, website: data.website, aiResult: data.aiResult
             })
-          }).catch(() => {});
+          }).catch(() => { });
         }
       }
     } catch (err) {
