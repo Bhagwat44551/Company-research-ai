@@ -25,7 +25,7 @@ async function searchCompany(query) {
 }
 
 //OpenRouter function
-async function askAI(prompt, model = "anthropic/claude-sonnet-4") {
+async function askAI(prompt, model = "openrouter/free") {
   const res = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
     model: model,
     messages: [{ role: "user", content: prompt }], max_tokens: 800
@@ -34,7 +34,7 @@ async function askAI(prompt, model = "anthropic/claude-sonnet-4") {
       Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
       'Content-Type': 'application/json'
     },
-    timeout: 2000
+    timeout: 25000
   });
   return res.data.choices[0].message.content;
 }
