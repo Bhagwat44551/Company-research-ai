@@ -15,9 +15,7 @@ function App() {
   const [channelId, setChannelId] = useState('');
   const [applicantName, setApplicantName] = useState('');
   const [applicantEmail, setApplicantEmail] = useState('');
-  const [serperKey, setSerperKey] = useState('');
-  const [openrouterKey, setOpenrouterKey] = useState('');
-
+  
   const models = [
     { label: 'Free Model (Auto)', value: 'openrouter/free' },
     { label: 'Claude Sonnet 4', value: 'anthropic/claude-sonnet-4' },
