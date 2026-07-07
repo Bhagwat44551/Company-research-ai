@@ -18,7 +18,7 @@ function App() {
 
   const models = [
     { label: 'Free Model (Auto)', value: 'openrouter/free' },
-    { label: 'Dolphin Mistral 24B (Free)', value: 'cognitivecomputations/dolphin-mistral-24b-venice-edition:free' },
+    { label: 'Google Gemma 4 26B A4B (Free)', value: 'google/gemma-4-26b-a4b-it:free' },
     { label: 'Tencent Hunyuan 3 (Free)', value: 'tencent/hy3:free' },
     { label: 'Poolside Laguna XS 2.1 (Free)', value: 'poolside/laguna-xs-2.1:free' },
   ];
