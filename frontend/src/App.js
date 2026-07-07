@@ -18,9 +18,9 @@ function App() {
 
   const models = [
     { label: 'Free Model (Auto)', value: 'openrouter/free' },
-    { label: 'Liquid LFM 2.5 1.2B Thinking (Free)', value: 'liquid/lfm-2.5-1.2b-thinking:free' },
     { label: 'Tencent Hunyuan 3 (Free)', value: 'tencent/hy3:free' },
     { label: 'Poolside Laguna XS 2.1 (Free)', value: 'poolside/laguna-xs-2.1:free' },
+    { label: 'GPT-OSS 120B (Own API / May be Rate Limited)', value: 'openai/gpt-oss-120b:free' },
   ];
 
   const examples = ['stripe.com', 'Tesla', 'Microsoft', 'OpenAI'];
