@@ -18,9 +18,8 @@ function App() {
 
   const models = [
     { label: 'Free Model (Auto)', value: 'openrouter/free' },
-    { label: 'DeepSeek R1 (Free)', value: 'deepseek/deepseek-r1:free' },
-    { label: 'Qwen 3 235B A22B (Free)', value: 'qwen/qwen3-235b-a22b:free' },
-    { label: 'Mistral Small 3.2 (Free)', value: 'mistralai/mistral-small-3.2-24b-instruct:free' },
+    { label: 'Dolphin Mistral 24B (Free)', value: 'cognitivecomputations/dolphin-mistral-24b-venice-edition:free' },
+    { label: 'Tencent Hunyuan 3 (Free)', value: 'tencent/hy3:free' },
     { label: 'Poolside Laguna XS 2.1 (Free)', value: 'poolside/laguna-xs-2.1:free' },
   ];
 
